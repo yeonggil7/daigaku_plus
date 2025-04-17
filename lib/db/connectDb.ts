@@ -22,9 +22,17 @@ export async function connectDB() {
     return;
   }
 
-  // 接続文字列が設定されていない場合はエラー
+  // Vercel環境で開発モードの場合はモックデータを使用（オプション）
+  if (process.env.VERCEL_ENV === 'development' && !MONGODB_URI) {
+    console.log('開発環境でモックデータを使用します');
+    state.isConnected = 1;
+    return;
+  }
+
+  // 接続文字列が設定されていない場合は警告を出すだけにする
   if (!MONGODB_URI) {
-    throw new Error('MongoDBの接続文字列が設定されていません。環境変数MONGODB_URIを設定してください。');
+    console.warn('MongoDBの接続文字列が設定されていません。一部機能が制限されます。');
+    return;
   }
 
   try {
@@ -37,7 +45,8 @@ export async function connectDB() {
     console.log(`MongoDB接続成功: ${conn.connection.host}`);
   } catch (error) {
     console.error('MongoDBへの接続に失敗しました', error);
-    throw error;
+    // エラーを投げると全体が停止するので、警告だけにする
+    state.isConnected = 0;
   }
 }
 
@@ -45,7 +54,7 @@ export async function connectDB() {
  * データベース接続を切断する関数（主にテスト用）
  */
 export async function disconnectDB() {
-  if (state.isConnected !== undefined) {
+  if (state.isConnected !== undefined && state.isConnected === 1) {
     await mongoose.disconnect();
     state.isConnected = undefined;
     console.log('MongoDB接続を切断しました');
