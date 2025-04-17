@@ -26,9 +26,12 @@
   ],
   "redirects": [
     {
-      "source": "/www.daigakuplus.jp/:path*",
-      "destination": "https://daigakuplus.jp/:path*",
+      "source": "/daigakuplus-vercel-app/:path*",
+      "destination": "https://daigakuplus.vercel.app/:path*",
       "permanent": true
     }
-  ]
+  ],
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "framework": "nextjs"
 } 
