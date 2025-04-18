@@ -1,37 +1,6 @@
 {
-  "crons": [
-    {
-      "path": "/api/scheduler/cron?secret=$CRON_SECRET",
-      "schedule": "0 0 * * 1,4"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
-          "key": "X-XSS-Protection",
-          "value": "1; mode=block"
-        }
-      ]
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/daigakuplus-vercel-app/:path*",
-      "destination": "https://daigakuplus.vercel.app/:path*",
-      "permanent": true
-    }
-  ],
   "buildCommand": "npm run build",
   "installCommand": "npm install",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "devCommand": "npm run dev"
 } 
