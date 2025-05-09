@@ -6,7 +6,6 @@ import Article from '@/lib/db/models/Article';
 // 環境変数の取得
 const API_SECRET = process.env.API_SECRET;
 const SKIP_MONGODB = process.env.SKIP_MONGODB === 'true';
-const IS_BUILD_TIME = process.env.VERCEL_ENV === 'production';
 
 /**
  * API認証確認
@@ -31,8 +30,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: '認証に失敗しました' }, { status: 401 });
     }
 
-    // ビルド時はモックデータを返す
-    if (SKIP_MONGODB || IS_BUILD_TIME) {
+    // SKIP_MONGODBが設定されている場合はモックデータを返す
+    if (SKIP_MONGODB) {
       return NextResponse.json({
         currentMonth: {
           year: 2023,

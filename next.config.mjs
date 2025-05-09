@@ -19,7 +19,6 @@ const nextConfig = {
     SITE_URL: process.env.NODE_ENV === 'production' 
       ? 'https://daigakuplus.jp' 
       : 'http://localhost:3000',
-    VERCEL_ENV: 'production',
     SKIP_MONGODB: 'true'
   },
   eslint: {

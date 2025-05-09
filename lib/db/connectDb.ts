@@ -3,7 +3,6 @@ import mongoose from 'mongoose';
 // 環境変数からMongoDBの接続文字列を取得
 const MONGODB_URI = process.env.MONGODB_URI;
 const SKIP_MONGODB = process.env.SKIP_MONGODB === 'true';
-const IS_BUILD_TIME = process.env.VERCEL_ENV === 'production';
 
 // 接続状態を管理
 interface ConnectionState {
@@ -24,16 +23,9 @@ export async function connectDB() {
     return;
   }
 
-  // ビルド時または明示的にスキップ指定がある場合はモックデータを使用
-  if (IS_BUILD_TIME || SKIP_MONGODB) {
-    console.log('静的ビルド環境でモックデータを使用します');
-    state.isConnected = 1;
-    return;
-  }
-
-  // Vercel環境では一時的にモックデータを使用
-  if (process.env.VERCEL_ENV) {
-    console.log('Vercel環境ではモックデータを使用します');
+  // SKIP_MONGODBが設定されている場合はモックデータを使用
+  if (SKIP_MONGODB) {
+    console.log('モックデータを使用します');
     state.isConnected = 1;
     return;
   }
@@ -65,7 +57,7 @@ export async function connectDB() {
  */
 export async function disconnectDB() {
   if (state.isConnected !== undefined && state.isConnected === 1) {
-    if (!IS_BUILD_TIME && !SKIP_MONGODB && MONGODB_URI) {
+    if (!SKIP_MONGODB && MONGODB_URI) {
       await mongoose.disconnect();
     }
     state.isConnected = undefined;

@@ -36,13 +36,7 @@
   "framework": "nextjs",
   "devCommand": "npm run dev",
   "env": {
-    "VERCEL_ENV": "production",
+    "MONGODB_URI": "",
     "SKIP_MONGODB": "true"
-  },
-  "build": {
-    "env": {
-      "VERCEL_ENV": "production",
-      "SKIP_MONGODB": "true"
-    }
   }
 } 
