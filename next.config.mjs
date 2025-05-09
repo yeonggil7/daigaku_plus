@@ -18,6 +18,8 @@ const nextConfig = {
     SITE_URL: process.env.NODE_ENV === 'production' 
       ? 'https://daigakuplus.jp' 
       : 'http://localhost:3000',
+    VERCEL_ENV: process.env.VERCEL_ENV || '',
+    SKIP_MONGODB: 'true'
   },
   eslint: {
     // Warning: このオプションを有効にすると、ESLintによる検証がスキップされます
@@ -26,7 +28,9 @@ const nextConfig = {
   typescript: {
     // Warning: このオプションを有効にすると、型チェックがスキップされます
     ignoreBuildErrors: true,
-  }
+  },
+  // 静的ページとして生成
+  output: 'export'
 };
 
 export default nextConfig; 

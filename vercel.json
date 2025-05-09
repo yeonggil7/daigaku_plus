@@ -30,5 +30,21 @@
       "destination": "https://daigakuplus.jp/:path*",
       "permanent": true
     }
-  ]
+  ],
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "framework": "nextjs",
+  "devCommand": "npm run dev",
+  "env": {
+    "VERCEL_ENV": "production",
+    "SKIP_MONGODB": "true",
+    "NODE_ENV": "production"
+  },
+  "build": {
+    "env": {
+      "VERCEL_ENV": "production",
+      "SKIP_MONGODB": "true",
+      "NODE_ENV": "production"
+    }
+  }
 } 
