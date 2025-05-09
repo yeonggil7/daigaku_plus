@@ -2,6 +2,8 @@ import mongoose from 'mongoose';
 
 // 環境変数からMongoDBの接続文字列を取得
 const MONGODB_URI = process.env.MONGODB_URI;
+const SKIP_MONGODB = process.env.SKIP_MONGODB === 'true';
+const IS_BUILD_TIME = process.env.VERCEL_ENV === 'production' && process.env.NODE_ENV === 'production';
 
 // 接続状態を管理
 interface ConnectionState {
@@ -19,6 +21,13 @@ const state: ConnectionState = {
 export async function connectDB() {
   // 既に接続済みの場合はそのまま返す
   if (state.isConnected === 1) {
+    return;
+  }
+
+  // ビルド時または明示的にスキップ指定がある場合はモックデータを使用
+  if (IS_BUILD_TIME || SKIP_MONGODB) {
+    console.log('静的ビルド環境でモックデータを使用します');
+    state.isConnected = 1;
     return;
   }
 
@@ -56,7 +65,9 @@ export async function connectDB() {
  */
 export async function disconnectDB() {
   if (state.isConnected !== undefined && state.isConnected === 1) {
-    await mongoose.disconnect();
+    if (!IS_BUILD_TIME && !SKIP_MONGODB && MONGODB_URI) {
+      await mongoose.disconnect();
+    }
     state.isConnected = undefined;
     console.log('MongoDB接続を切断しました');
   }

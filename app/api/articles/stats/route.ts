@@ -5,6 +5,8 @@ import Article from '@/lib/db/models/Article';
 
 // 環境変数の取得
 const API_SECRET = process.env.API_SECRET;
+const SKIP_MONGODB = process.env.SKIP_MONGODB === 'true';
+const IS_BUILD_TIME = process.env.VERCEL_ENV === 'production' && process.env.NODE_ENV === 'production';
 
 /**
  * API認証確認
@@ -27,6 +29,42 @@ export async function GET(request: NextRequest) {
     // 認証チェック
     if (!verifyApiAuth(request)) {
       return NextResponse.json({ error: '認証に失敗しました' }, { status: 401 });
+    }
+
+    // ビルド時はモックデータを返す
+    if (SKIP_MONGODB || IS_BUILD_TIME) {
+      return NextResponse.json({
+        currentMonth: {
+          year: 2023,
+          month: 7,
+          articleCount: 15,
+          totalCost: 300
+        },
+        categoryStats: {
+          study: 20,
+          career: 15,
+          community: 10,
+          partTime: 5
+        },
+        statusStats: {
+          draft: 10,
+          scheduled: 5,
+          published: 35
+        },
+        sourceStats: {
+          ai: 40,
+          manual: 10
+        },
+        monthlyTrend: [
+          { year: 2023, month: 7, count: 15, cost: 300, avgCost: 20 },
+          { year: 2023, month: 6, count: 12, cost: 240, avgCost: 20 },
+          { year: 2023, month: 5, count: 10, cost: 200, avgCost: 20 },
+          { year: 2023, month: 4, count: 8, cost: 160, avgCost: 20 },
+          { year: 2023, month: 3, count: 5, cost: 100, avgCost: 20 },
+          { year: 2023, month: 2, count: 0, cost: 0, avgCost: 0 }
+        ],
+        latestArticles: []
+      });
     }
 
     // データベース接続

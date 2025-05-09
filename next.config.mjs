@@ -13,12 +13,14 @@ const nextConfig = {
         pathname: '/**',
       }
     ],
+    unoptimized: true,
   },
   env: {
     SITE_URL: process.env.NODE_ENV === 'production' 
       ? 'https://daigakuplus.jp' 
       : 'http://localhost:3000',
-    VERCEL_ENV: process.env.VERCEL_ENV || '',
+    VERCEL_ENV: 'production',
+    NODE_ENV: 'production',
     SKIP_MONGODB: 'true'
   },
   eslint: {
