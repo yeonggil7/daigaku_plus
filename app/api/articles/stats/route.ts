@@ -6,7 +6,7 @@ import Article from '@/lib/db/models/Article';
 // 環境変数の取得
 const API_SECRET = process.env.API_SECRET;
 const SKIP_MONGODB = process.env.SKIP_MONGODB === 'true';
-const IS_BUILD_TIME = process.env.VERCEL_ENV === 'production' && process.env.NODE_ENV === 'production';
+const IS_BUILD_TIME = process.env.VERCEL_ENV === 'production';
 
 /**
  * API認証確認

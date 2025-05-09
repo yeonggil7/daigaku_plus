@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 // 環境変数からMongoDBの接続文字列を取得
 const MONGODB_URI = process.env.MONGODB_URI;
 const SKIP_MONGODB = process.env.SKIP_MONGODB === 'true';
-const IS_BUILD_TIME = process.env.VERCEL_ENV === 'production' && process.env.NODE_ENV === 'production';
+const IS_BUILD_TIME = process.env.VERCEL_ENV === 'production';
 
 // 接続状態を管理
 interface ConnectionState {
