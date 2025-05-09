@@ -37,14 +37,12 @@
   "devCommand": "npm run dev",
   "env": {
     "VERCEL_ENV": "production",
-    "SKIP_MONGODB": "true",
-    "NODE_ENV": "production"
+    "SKIP_MONGODB": "true"
   },
   "build": {
     "env": {
       "VERCEL_ENV": "production",
-      "SKIP_MONGODB": "true",
-      "NODE_ENV": "production"
+      "SKIP_MONGODB": "true"
     }
   }
 } 
