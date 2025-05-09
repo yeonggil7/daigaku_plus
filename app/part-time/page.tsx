@@ -1,6 +1,66 @@
 import Link from 'next/link';
 import LatestArticles from '@/components/home/LatestArticles';
 import Image from 'next/image';
+import { Metadata } from 'next';
+
+// メタデータを追加
+export const metadata: Metadata = {
+  title: '大学生のバイト情報 | 大学生活ガイド',
+  description: '学業と両立できるアルバイト情報や、効率的な探し方、面接対策など、充実したバイトライフをサポートします。'
+};
+
+// モックの最新記事
+const mockLatestArticles = [
+  {
+    _id: '1',
+    title: '大学生におすすめのバイト10選',
+    summary: '時給が高いものから、スキルが身につくものまで、大学生にぴったりのバイトを紹介します。',
+    slug: 'recommended-part-time-jobs',
+    category: 'part-time',
+    publishDate: new Date('2023-07-10')
+  },
+  {
+    _id: '2',
+    title: 'バイト面接での好印象の与え方',
+    summary: '採用担当者が見ているポイントと、面接で成功するためのコツを解説します。',
+    slug: 'part-time-interview-tips',
+    category: 'part-time',
+    publishDate: new Date('2023-06-05')
+  },
+  {
+    _id: '3',
+    title: '学業とバイトを両立するコツ',
+    summary: '勉強の妨げにならないバイトの選び方と、効率的な時間管理術を紹介します。',
+    slug: 'balance-study-work',
+    category: 'part-time',
+    publishDate: new Date('2023-05-20')
+  }
+];
+
+// カテゴリスタイル管理関数
+function getCategoryStyle(category: string) {
+  switch (category) {
+    case 'study':
+      return { bg: 'bg-blue-100', text: 'text-blue-800' };
+    case 'career':
+      return { bg: 'bg-green-100', text: 'text-green-800' };
+    case 'community':
+      return { bg: 'bg-purple-100', text: 'text-purple-800' };
+    case 'part-time':
+      return { bg: 'bg-yellow-100', text: 'text-yellow-800' };
+    default:
+      return { bg: 'bg-gray-100', text: 'text-gray-800' };
+  }
+}
+
+// 日付フォーマット関数
+function formatDate(date: Date): string {
+  return date.toLocaleDateString('ja-JP', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+}
 
 export default function PartTimePage() {
   return (
@@ -96,13 +156,39 @@ export default function PartTimePage() {
       
       {/* おすすめのバイト記事 */}
       <section className="mb-16">
-        <LatestArticles 
-          limit={3} 
-          category="part-time"
-          title="おすすめのバイト情報記事" 
-          viewMoreLink="/articles?category=part-time" 
-          viewMoreText="すべてのバイト記事を見る" 
-        />
+        <div className="mb-6 flex justify-between items-center">
+          <h2 className="text-2xl font-bold">おすすめのバイト情報記事</h2>
+          <Link href="/articles?category=part-time" className="text-yellow-600 hover:underline">
+            すべてのバイト記事を見る
+          </Link>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {mockLatestArticles.map((article) => {
+            const categoryStyle = getCategoryStyle(article.category);
+            
+            return (
+              <div key={article._id} className="bg-white rounded-lg shadow-md overflow-hidden">
+                <div className="h-48 bg-gray-200"></div>
+                <div className="p-6">
+                  <span className={`inline-block px-3 py-1 ${categoryStyle.bg} ${categoryStyle.text} text-xs font-medium rounded-full mb-2`}>
+                    バイト
+                  </span>
+                  <h3 className="font-bold text-lg mb-2">{article.title}</h3>
+                  <p className="text-gray-600 text-sm mb-4">{article.summary}</p>
+                  <div className="flex justify-between items-center">
+                    <div className="text-sm text-gray-500">
+                      {formatDate(article.publishDate)}
+                    </div>
+                    <Link href={`/blog/${article.slug}`} className="text-yellow-600 hover:underline text-sm">
+                      続きを読む →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </section>
       
       {/* バイト探しのコツセクション */}

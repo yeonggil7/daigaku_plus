@@ -20,7 +20,6 @@ const nextConfig = {
       ? 'https://daigakuplus.jp' 
       : 'http://localhost:3000',
     VERCEL_ENV: 'production',
-    NODE_ENV: 'production',
     SKIP_MONGODB: 'true'
   },
   eslint: {
@@ -30,9 +29,7 @@ const nextConfig = {
   typescript: {
     // Warning: このオプションを有効にすると、型チェックがスキップされます
     ignoreBuildErrors: true,
-  },
-  // 静的ページとして生成
-  output: 'export'
+  }
 };
 
 export default nextConfig; 

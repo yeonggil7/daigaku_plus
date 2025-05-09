@@ -1,14 +1,22 @@
 import { NextResponse } from 'next/server';
+import { articleService } from '@/lib/db/services/articleService';
 import { connectDB } from '@/lib/db/connectDb';
 import Article from '@/lib/db/models/Article';
 import { generateArticle } from '@/lib/articles/generator';
 import { saveArticle } from '@/lib/articles/repository';
 import { ArticleCategory } from '@/lib/articles/generator';
 
+// 動的ルートとして設定
+export const dynamic = 'force-dynamic';
+
 // 接続カウンターとタイムスタンプを記録
 let connectionCounter = 0;
 let lastConnectionTime: Date | null = null;
 
+/**
+ * スケジューラーのcronジョブAPI
+ * 予約投稿の記事を公開するなどの定期実行タスクを処理します
+ */
 export async function GET(request: Request) {
   try {
     // URLからシークレットを取得

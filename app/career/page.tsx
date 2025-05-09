@@ -1,6 +1,66 @@
 import Link from 'next/link';
 import LatestArticles from '@/components/home/LatestArticles';
 import Image from 'next/image';
+import { Metadata } from 'next';
+
+// メタデータを追加
+export const metadata: Metadata = {
+  title: 'キャリア・就職情報 | 大学生活ガイド',
+  description: '就職活動のサポートから、インターンシップ、自己分析、業界研究まで、あなたの将来のキャリアをサポートする情報を提供します。'
+};
+
+// モックの最新記事
+const mockLatestArticles = [
+  {
+    _id: '1',
+    title: '自己分析の効果的な方法',
+    summary: '就活で差をつける自己分析のポイントとは？強みを見つけるための具体的な手法を紹介します。',
+    slug: 'effective-self-analysis',
+    category: 'career',
+    publishDate: new Date('2023-06-15')
+  },
+  {
+    _id: '2',
+    title: '面接での自己PRの伝え方',
+    summary: '面接官に印象に残る自己PRの構成方法と実例を紹介します。',
+    slug: 'self-pr-interview',
+    category: 'career',
+    publishDate: new Date('2023-05-20')
+  },
+  {
+    _id: '3',
+    title: '業界研究の進め方',
+    summary: '効率的な業界研究のステップと情報収集のコツを解説します。',
+    slug: 'industry-research-tips',
+    category: 'career',
+    publishDate: new Date('2023-04-10')
+  }
+];
+
+// カテゴリスタイル管理関数
+function getCategoryStyle(category: string) {
+  switch (category) {
+    case 'study':
+      return { bg: 'bg-blue-100', text: 'text-blue-800' };
+    case 'career':
+      return { bg: 'bg-green-100', text: 'text-green-800' };
+    case 'community':
+      return { bg: 'bg-purple-100', text: 'text-purple-800' };
+    case 'part-time':
+      return { bg: 'bg-yellow-100', text: 'text-yellow-800' };
+    default:
+      return { bg: 'bg-gray-100', text: 'text-gray-800' };
+  }
+}
+
+// 日付フォーマット関数
+function formatDate(date: Date): string {
+  return date.toLocaleDateString('ja-JP', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+}
 
 export default function CareerPage() {
   return (
@@ -111,13 +171,39 @@ export default function CareerPage() {
       
       {/* おすすめのキャリア記事 */}
       <section className="mb-16">
-        <LatestArticles 
-          limit={3} 
-          category="career"
-          title="おすすめのキャリア記事" 
-          viewMoreLink="/articles?category=career" 
-          viewMoreText="すべてのキャリア記事を見る" 
-        />
+        <div className="mb-6 flex justify-between items-center">
+          <h2 className="text-2xl font-bold">おすすめのキャリア記事</h2>
+          <Link href="/articles?category=career" className="text-green-600 hover:underline">
+            すべてのキャリア記事を見る
+          </Link>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {mockLatestArticles.map((article) => {
+            const categoryStyle = getCategoryStyle(article.category);
+            
+            return (
+              <div key={article._id} className="bg-white rounded-lg shadow-md overflow-hidden">
+                <div className="h-48 bg-gray-200"></div>
+                <div className="p-6">
+                  <span className={`inline-block px-3 py-1 ${categoryStyle.bg} ${categoryStyle.text} text-xs font-medium rounded-full mb-2`}>
+                    キャリア
+                  </span>
+                  <h3 className="font-bold text-lg mb-2">{article.title}</h3>
+                  <p className="text-gray-600 text-sm mb-4">{article.summary}</p>
+                  <div className="flex justify-between items-center">
+                    <div className="text-sm text-gray-500">
+                      {formatDate(article.publishDate)}
+                    </div>
+                    <Link href={`/blog/${article.slug}`} className="text-green-600 hover:underline text-sm">
+                      続きを読む →
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </section>
       
       {/* インターンシップ情報 */}

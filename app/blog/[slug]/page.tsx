@@ -3,6 +3,9 @@ import Article from '@/lib/db/models/Article';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { formatDate } from '@/lib/utils/date';
+import React from 'react';
+import { Metadata } from 'next';
+import Image from 'next/image';
 
 // カテゴリ名を日本語に変換
 function getCategoryName(category: string): string {
@@ -123,4 +126,42 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
       </div>
     </div>
   );
+}
+
+export async function generateStaticParams() {
+  // 静的生成時には空の配列を返して、動的にページを生成しないようにします
+  return [];
+}
+
+// ページのメタデータを動的に生成
+export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
+  try {
+    await connectDB();
+    const article = await Article.findOne({ slug: params.slug, status: 'published' }).lean();
+    
+    if (!article) {
+      return {
+        title: 'ページが見つかりません',
+        description: '指定された記事は存在しないか、削除された可能性があります。'
+      };
+    }
+
+    return {
+      title: `${article.title} | 大学生活ガイド`,
+      description: article.summary || `${article.title}に関する詳細記事です。`,
+      openGraph: {
+        title: article.title,
+        description: article.summary || `${article.title}に関する詳細記事です。`,
+        type: 'article',
+        publishedTime: article.publishDate?.toISOString() || article.createdAt.toISOString(),
+        authors: [article.author || 'AI編集部'],
+      },
+    };
+  } catch (error) {
+    console.error('Metadata generation error:', error);
+    return {
+      title: '大学生活ガイド',
+      description: '大学生向けの情報サイト'
+    };
+  }
 }

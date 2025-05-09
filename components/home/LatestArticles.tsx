@@ -14,6 +14,126 @@ type LatestArticlesProps = {
   viewMoreText?: string;
 };
 
+// モックデータ
+const mockArticles: any[] = [
+  {
+    _id: '1',
+    title: '大学生におすすめの勉強法',
+    summary: '効率的な学習法と集中力を高めるための方法を紹介します。',
+    slug: 'effective-study-methods',
+    category: 'study',
+    publishDate: new Date('2023-07-01')
+  },
+  {
+    _id: '2',
+    title: '就活準備の始め方',
+    summary: '就職活動を成功させるための準備と心構えについて解説します。',
+    slug: 'job-hunting-preparation',
+    category: 'career',
+    publishDate: new Date('2023-06-15')
+  },
+  {
+    _id: '3',
+    title: 'サークル選びのポイント',
+    summary: '大学生活を充実させるためのサークル選びのコツと注意点を紹介します。',
+    slug: 'circle-selection-guide',
+    category: 'community',
+    publishDate: new Date('2023-06-01')
+  },
+  {
+    _id: '4',
+    title: '学生におすすめのバイト',
+    summary: '大学生におすすめのアルバイト先と両立のコツについて解説します。',
+    slug: 'recommended-part-time-jobs',
+    category: 'part-time',
+    publishDate: new Date('2023-05-15')
+  }
+];
+
+// カテゴリー別モックデータ
+const categoryMockArticles: {[key: string]: any[]} = {
+  'study': [
+    {
+      _id: '1',
+      title: '大学生におすすめの勉強法',
+      summary: '効率的な学習法と集中力を高めるための方法を紹介します。',
+      slug: 'effective-study-methods',
+      category: 'study',
+      publishDate: new Date('2023-07-01')
+    },
+    {
+      _id: '5',
+      title: 'テスト対策の効率的な進め方',
+      summary: '試験前の効果的な学習計画と暗記のコツを紹介します。',
+      slug: 'test-preparation-tips',
+      category: 'study',
+      publishDate: new Date('2023-06-20')
+    },
+    {
+      _id: '6',
+      title: '大学のレポート作成術',
+      summary: '高評価を得るためのレポートの書き方と資料の探し方を解説します。',
+      slug: 'report-writing-guide',
+      category: 'study',
+      publishDate: new Date('2023-06-05')
+    }
+  ],
+  'career': [
+    {
+      _id: '2',
+      title: '就活準備の始め方',
+      summary: '就職活動を成功させるための準備と心構えについて解説します。',
+      slug: 'job-hunting-preparation',
+      category: 'career',
+      publishDate: new Date('2023-06-15')
+    },
+    {
+      _id: '7',
+      title: '自己分析の効果的な方法',
+      summary: '就活で差をつける自己分析のポイントとは？強みを見つけるための具体的な手法を紹介します。',
+      slug: 'effective-self-analysis',
+      category: 'career',
+      publishDate: new Date('2023-05-25')
+    },
+    {
+      _id: '8',
+      title: '面接での自己PRの伝え方',
+      summary: '面接官に印象に残る自己PRの構成方法と実例を紹介します。',
+      slug: 'self-pr-interview',
+      category: 'career',
+      publishDate: new Date('2023-05-10')
+    }
+  ],
+  'community': [
+    {
+      _id: '3',
+      title: 'サークル選びのポイント',
+      summary: '大学生活を充実させるためのサークル選びのコツと注意点を紹介します。',
+      slug: 'circle-selection-guide',
+      category: 'community',
+      publishDate: new Date('2023-06-01')
+    }
+  ],
+  'part-time': [
+    {
+      _id: '4',
+      title: '学生におすすめのバイト',
+      summary: '大学生におすすめのアルバイト先と両立のコツについて解説します。',
+      slug: 'recommended-part-time-jobs',
+      category: 'part-time',
+      publishDate: new Date('2023-05-15')
+    },
+    {
+      _id: '9',
+      title: 'バイト面接での好印象の与え方',
+      summary: '採用担当者が見ているポイントと、面接で成功するためのコツを解説します。',
+      slug: 'part-time-interview-tips',
+      category: 'part-time',
+      publishDate: new Date('2023-04-25')
+    }
+  ]
+};
+
 export default async function LatestArticles({
   limit = 3,
   category,
@@ -21,15 +141,28 @@ export default async function LatestArticles({
   viewMoreLink = "/articles",
   viewMoreText = "すべて見る"
 }: LatestArticlesProps) {
-  // 記事を取得
-  const result = await articleService.getArticles({
-    status: 'published',
-    category,
-    limit,
-    skip: 0
-  });
-
-  const articles = result.articles;
+  let articles;
+  
+  // 静的ビルド時またはVercel環境ではモックデータを使用
+  if (process.env.SKIP_MONGODB === 'true' || process.env.VERCEL_ENV === 'production') {
+    if (category) {
+      // カテゴリー指定がある場合は、そのカテゴリーのモックデータを使用
+      articles = (categoryMockArticles[category] || mockArticles).slice(0, limit);
+    } else {
+      // カテゴリー指定がない場合は、全カテゴリーのモックデータを使用
+      articles = mockArticles.slice(0, limit);
+    }
+  } else {
+    // 通常のデータ取得
+    const result = await articleService.getArticles({
+      status: 'published',
+      category,
+      limit,
+      skip: 0
+    });
+    
+    articles = result.articles;
+  }
 
   // カテゴリーに応じた色とテキストを設定するユーティリティ関数
   const getCategoryStyles = (category: string) => {
@@ -59,10 +192,13 @@ export default async function LatestArticles({
         {articles.length > 0 ? (
           articles.map((article: IArticle) => {
             const categoryStyle = getCategoryStyles(article.category);
+            const articleId = article._id ? 
+              (typeof article._id === 'string' ? article._id : (article._id as unknown as Types.ObjectId).toString()) : 
+              '0';
             
             return (
               <Link 
-                key={(article._id as unknown as Types.ObjectId).toString()} 
+                key={articleId} 
                 href={`/articles/${article.slug}`}
                 className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-all transform hover:-translate-y-1"
               >
