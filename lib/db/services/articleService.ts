@@ -1,6 +1,38 @@
-import { connectDB } from '../connectDb';
+import { connectDB, isConnected } from '../connectDb';
 import Article, { IArticle, ArticleStatus } from '../models/Article';
 import { ArticleCategory, ArticleGenerationParams, generateArticle } from '../../ai/article-generator';
+
+// モックデータ（MongoDB接続がないケース用）
+const MOCK_ARTICLES = [
+  {
+    _id: '1',
+    title: '大学生活スタートガイド',
+    content: '<p>大学生活を充実させるためのガイドです。</p>',
+    summary: '新入生のための大学生活ガイド',
+    slug: 'university-start-guide',
+    category: 'study',
+    tags: ['大学生活', '新入生'],
+    status: 'published',
+    publishDate: new Date(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    author: 'サイト管理者'
+  },
+  {
+    _id: '2',
+    title: '効率的な勉強法',
+    content: '<p>効率よく勉強するためのテクニックを紹介します。</p>',
+    summary: '時間を有効活用して成績アップ',
+    slug: 'efficient-study-methods',
+    category: 'study',
+    tags: ['勉強法', '時間管理'],
+    status: 'published',
+    publishDate: new Date(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    author: 'サイト管理者'
+  }
+];
 
 /**
  * 記事作成のためのパラメータ
@@ -144,35 +176,75 @@ export const articleService = {
       sortOrder?: 'asc' | 'desc';
     } = {}
   ): Promise<IArticle[]> {
-    await connectDB();
-    
-    const query: any = {};
-    if (options.status) query.status = options.status;
-    if (options.category) query.category = options.category;
-    
-    const sortOptions: any = {};
-    sortOptions[options.sortBy || 'createdAt'] = options.sortOrder === 'asc' ? 1 : -1;
-    
-    return await Article.find(query)
-      .sort(sortOptions)
-      .skip(options.skip || 0)
-      .limit(options.limit || 50);
+    try {
+      await connectDB();
+      
+      // MongoDB接続に失敗した場合はモックデータを使用
+      if (!isConnected()) {
+        return MOCK_ARTICLES as unknown as IArticle[];
+      }
+      
+      const query: any = {};
+      if (options.status) query.status = options.status;
+      if (options.category) query.category = options.category;
+      
+      const sortOptions: any = {};
+      sortOptions[options.sortBy || 'createdAt'] = options.sortOrder === 'asc' ? 1 : -1;
+      
+      return await Article.find(query)
+        .sort(sortOptions)
+        .skip(options.skip || 0)
+        .limit(options.limit || 50);
+    } catch (error) {
+      console.error('記事一覧取得中にエラーが発生しました:', error);
+      // モックデータから返す
+      return MOCK_ARTICLES as unknown as IArticle[];
+    }
   },
   
   /**
    * IDで記事を取得
    */
   async getArticleById(id: string): Promise<IArticle | null> {
-    await connectDB();
-    return await Article.findById(id);
+    try {
+      // MongoDB接続を試みる
+      await connectDB();
+      
+      // MongoDB接続に失敗した場合はモックデータを使用
+      if (!isConnected()) {
+        const mockArticle = MOCK_ARTICLES.find(article => article._id === id);
+        return mockArticle as unknown as IArticle || null;
+      }
+      
+      return await Article.findById(id);
+    } catch (error) {
+      console.error('記事取得中にエラーが発生しました:', error);
+      // モックデータから返す
+      const mockArticle = MOCK_ARTICLES.find(article => article._id === id);
+      return mockArticle as unknown as IArticle || null;
+    }
   },
   
   /**
    * スラッグで記事を取得
    */
   async getArticleBySlug(slug: string): Promise<IArticle | null> {
-    await connectDB();
-    return await Article.findOne({ slug });
+    try {
+      await connectDB();
+      
+      // MongoDB接続に失敗した場合はモックデータを使用
+      if (!isConnected()) {
+        const mockArticle = MOCK_ARTICLES.find(article => article.slug === slug);
+        return mockArticle as unknown as IArticle || null;
+      }
+      
+      return await Article.findOne({ slug });
+    } catch (error) {
+      console.error('記事取得中にエラーが発生しました:', error);
+      // モックデータから返す
+      const mockArticle = MOCK_ARTICLES.find(article => article.slug === slug);
+      return mockArticle as unknown as IArticle || null;
+    }
   },
   
   /**
