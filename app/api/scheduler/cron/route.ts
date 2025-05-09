@@ -40,7 +40,7 @@ export async function GET(request: Request) {
     await checkMonthlyCost();
 
     // カテゴリをランダムに選択
-    const categories = ['study', 'career', 'community', 'part-time'];
+    const categories: ArticleCategory[] = ['study', 'career', 'community', 'part-time'];
     const randomCategory = categories[Math.floor(Math.random() * categories.length)];
 
     // AI記事の生成（カテゴリに基づく）
